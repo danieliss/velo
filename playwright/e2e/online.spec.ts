@@ -5,5 +5,3 @@ test('webapp deve estar online', async ({ page }) => {
 
   await expect(page).toHaveTitle(/Velô by Papito/)
 })
-
-
