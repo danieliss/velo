@@ -50,14 +50,12 @@ import { generateOrderCode } from '../support/helpers';
     //     await expect(page.getByText('APROVADO')).toBeVisible()
 
 
-    await expect(page.getByTestId('order-result-VLO-7QZPJJ')).toMatchAriaSnapshot(`
+      await expect(page.getByTestId(`order-result-${order}`)).toMatchAriaSnapshot(`
         - img
         - paragraph: Pedido
-        - paragraph: VLO-7QZPJJ
+        - paragraph: ${order}
         - img
         - text: APROVADO
-        `);
-      await expect(page.getByTestId('order-result-VLO-7QZPJJ')).toMatchAriaSnapshot(`
         - img "Velô Sprint"
         - paragraph: Modelo
         - paragraph: Velô Sprint
