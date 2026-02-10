@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Package, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Search, Package, CircleCheckBig, CircleX, Clock, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -117,8 +117,8 @@ const OrderLookup = () => {
         {/* Not Found Message */}
         {notFound && (
           <Card className="border-destructive/50 bg-destructive/5 animate-fade-in">
-            <CardContent className="py-8 text-center">
-              <XCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
+          <CardContent className="py-8 text-center">
+            <CircleX className="w-12 h-12 text-destructive mx-auto mb-4" />
               <h3 className="text-lg font-medium text-foreground mb-2">
                 Pedido não encontrado
               </h3>
@@ -144,16 +144,23 @@ const OrderLookup = () => {
                   </div>
                 </div>
                 <div
+                  role="status"
                   className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${
                     searchedOrder.status === 'APROVADO'
                       ? 'bg-green-100 text-green-700'
-                      : 'bg-red-100 text-red-700'
+                      : searchedOrder.status === 'EM_ANALISE'
+                        ? 'bg-amber-100 text-amber-700'
+                        : 'bg-red-100 text-red-700'
                   }`}
                 >
-                  {searchedOrder.status === 'APROVADO' ? (
-                    <CheckCircle className="w-4 h-4" />
-                  ) : (
-                    <XCircle className="w-4 h-4" />
+                  {searchedOrder.status === 'APROVADO' && (
+                    <CircleCheckBig className="w-4 h-4" />
+                  )}
+                  {searchedOrder.status === 'EM_ANALISE' && (
+                    <Clock className="w-4 h-4 lucide-clock-icon" />
+                  )}
+                  {searchedOrder.status === 'REPROVADO' && (
+                    <CircleX className="w-4 h-4" />
                   )}
                   {searchedOrder.status}
                 </div>

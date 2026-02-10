@@ -51,23 +51,13 @@ import { generateOrderCode } from '../support/helpers';
         await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.number)
         await page.getByRole('button', { name: 'Buscar Pedido' }).click()
 
-
-
-    //     const containerPedido = page.getByRole('paragraph')
-    //         .filter({ hasText: /^Pedido$/ })
-    //         .locator('..') //sobe para o elemento pai-a div que agrupa ambos
-
-    //     await expect(containerPedido).toContainText(order, { timeout: 10_000 })
-
-    //     await expect(page.getByText('APROVADO')).toBeVisible()
-
-
       await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
         - img
         - paragraph: Pedido
         - paragraph: ${order.number}
-        - img
-        - text: ${order.status}
+        - status:
+            - img
+            - text: ${order.status}
         - img "Velô Sprint"
         - paragraph: Modelo
         - paragraph: Velô Sprint
@@ -89,13 +79,20 @@ import { generateOrderCode } from '../support/helpers';
         - heading "Pagamento" [level=4]
         - paragraph: ${order.payment}
         - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
-        `);
+        `)
 
-    });
+       const statusBadge =  page.getByRole('status').filter({hasText: order.status})
+       await expect(statusBadge).toHaveClass(/bg-green-100/)
+       await expect(statusBadge).toHaveClass(/text-green-700/)
+       
+       const statusIcon = statusBadge.locator('svg')
+       await expect(statusIcon).toHaveClass(/lucide-circle-check-big/)
+
+
+    })
+
     test('deve consultar um pedido reprovado', async ({ page }) => {
 
-        //Test Data
-        // const order = 'VLO-RJXU15'
 
 
         const order = {
@@ -114,22 +111,13 @@ import { generateOrderCode } from '../support/helpers';
         await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.number)
         await page.getByRole('button', { name: 'Buscar Pedido' }).click()
 
-
-    //     const containerPedido = page.getByRole('paragraph')
-    //         .filter({ hasText: /^Pedido$/ })
-    //         .locator('..') //sobe para o elemento pai-a div que agrupa ambos
-
-    //     await expect(containerPedido).toContainText(order, { timeout: 10_000 })
-
-    //     await expect(page.getByText('APROVADO')).toBeVisible()
-        //assert
-
         await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
             - img
             - paragraph: Pedido
             - paragraph: ${order.number}
-            - img
-            - text: ${order.status}
+            - status:
+                - img
+                - text: ${order.status}
             - img "Velô Sprint"
             - paragraph: Modelo
             - paragraph: Velô Sprint
@@ -151,9 +139,15 @@ import { generateOrderCode } from '../support/helpers';
             - heading "Pagamento" [level=4]
             - paragraph: ${order.payment}
             - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
-            `);
+            `)
+            const statusBadge =  page.getByRole('status').filter({hasText: order.status})
+            await expect(statusBadge).toHaveClass(/bg-red-100/)
+            await expect(statusBadge).toHaveClass(/text-red-700/)
+            
+            const statusIcon = statusBadge.locator('svg')
+            await expect(statusIcon).toHaveClass(/lucide-circle-x/)
 
-    });
+    })
 
     test('deve consultar um pedido em analise', async ({ page }) => {
 
@@ -182,8 +176,9 @@ import { generateOrderCode } from '../support/helpers';
             - img
             - paragraph: Pedido
             - paragraph: ${order.number}
-            - img
-            - text: ${order.status}
+            - status:
+                - img
+                - text: ${order.status}
             - img "Velô Sprint"
             - paragraph: Modelo
             - paragraph: Velô Sprint
@@ -205,9 +200,17 @@ import { generateOrderCode } from '../support/helpers';
             - heading "Pagamento" [level=4]
             - paragraph: ${order.payment}
             - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
-            `);
+            `)
 
-    });
+            const statusBadge =  page.getByRole('status').filter({hasText: order.status})
+            await expect(statusBadge).toHaveClass(/bg-amber-100/)
+            await expect(statusBadge).toHaveClass(/text-amber-700/)
+            
+            const statusIcon = statusBadge.locator('svg')
+            await expect(statusIcon).toHaveClass(/lucide-clock-icon/)
+
+    })
+
 
 
 
