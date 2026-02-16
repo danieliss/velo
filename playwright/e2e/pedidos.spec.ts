@@ -10,7 +10,7 @@ import { generateOrderCode } from '../support/helpers';
 //     test('deve consultar um pedido aprovado', async ({ page }) => {   
     
 
-    // const order = 'VLO-7QZPJJ'
+    // const order = 'VLO-ULUOXQ'
 
     // await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order)
     // await page.getByRole('button', { name: 'Buscar Pedido' }).click()
@@ -35,15 +35,15 @@ import { generateOrderCode } from '../support/helpers';
     test('deve consultar um pedido aprovado', async ({ page }) => {
 
         //Test Data
-        //const order = 'VLO-7QZPJJ'
+        //const order = 'VLO-ULUOXQ'
         const order = {
-            number:'VLO-7QZPJJ',
+            number:'VLO-ULUOXQ',
             status: 'APROVADO',
             color: 'Midnight Black',
             wheels: 'aero Wheels',
             customer: {
-                name: 'Victor Granell dos Santos Barbadillo',
-                email:'victorgsbarba@gmail.com'
+                name: 'Machado De Assis',
+                email:'machado@teste.com'
             },
             payment:'À Vista'
         }
@@ -210,9 +210,6 @@ import { generateOrderCode } from '../support/helpers';
             await expect(statusIcon).toHaveClass(/lucide-clock-icon/)
 
     })
-
-
-
 
     test('deve exibir mensagem quando não é encontrado', async ({ page }) => {
         const order = generateOrderCode()
