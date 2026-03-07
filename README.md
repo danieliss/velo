@@ -33,7 +33,7 @@ Uma SPA (Single Page Application) que permite:
 yarn install
 
 # Rodar em desenvolvimento
-yarn run dev
+yarn dev
 ```
 
 Acesse: `http://localhost:5173`
@@ -65,11 +65,11 @@ VITE_SUPABASE_URL="https://seu_project_id.supabase.co"
 
 ```bash
 # Instalar CLI
-yarn add install supabase -D
+yarn add supabase -D
 
 # Login e vincular projeto
 yarn supabase login
-yarn supabase link --project-ref glkzsklykbqijjqazqim
+yarn supabase link --project-ref ylhtbnzypxtmlvvhbtyo
 
 # Aplicar migrações (cria tabelas e RLS)
 yarn supabase db push
