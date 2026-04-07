@@ -1,7 +1,7 @@
 import { test, expect } from '../support/fixtures'
 import { generateOrderCode } from '../support/helpers'
 import type { OrderDetails } from '../support/actions/orderLookupActions'
-import { insertOrder, deleteOrderByNumber } from '../support/database/orderRepository'
+import { deleteOrderByNumber, insertOrder } from '../support/database/orderRepository'
 
 import testData from '../support/fixtures/orders.json' with { type: 'json' }
 
@@ -56,7 +56,7 @@ test.describe('Consulta de Pedido', () => {
     await app.orderLookup.validateOrderNotFound()
   })
 
-  test('deve manter o botão de busca desabilitado com campo vazio ou apenas espaços', async ({ app, page }) => {
+  test('deve manter o botão de busca desabilitado com campo vazio ou apenas espaços', async ({ app }) => {
     const button = app.orderLookup.elements.searchButton
     await expect(button).toBeDisabled()
 
