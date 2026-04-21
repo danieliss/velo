@@ -1,13 +1,24 @@
 import { test, expect } from '../support/fixtures'
 import { generateOrderCode } from '../support/helpers'
 import type { OrderDetails } from '../support/actions/orderLookupActions'
-import { insertOrder, deleteOrderByNumber } from '../support/database/orderRepository'
+import { ensureDatabaseAvailable, insertOrder, deleteOrderByNumber, isDbUnavailableError } from '../support/database/orderRepository'
 
 import testData from '../support/fixtures/orders.json' with { type: 'json' }
 
 test.describe('Consulta de Pedido', () => {
 
   test.beforeEach(async ({ app }) => {
+    try {
+      await ensureDatabaseAvailable()
+    } catch (error) {
+      if (isDbUnavailableError(error)) {
+        test.skip(true, 'Skipping test: external database is unavailable.')
+        return
+      }
+
+      throw error
+    }
+
     await app.orderLookup.open()
   })
 
