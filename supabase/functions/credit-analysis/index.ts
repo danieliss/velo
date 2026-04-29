@@ -22,7 +22,7 @@ function createJsonResponse(body: Record<string, unknown>, status = 200) {
 function getCreditAnalysisResult() {
   return {
     status: 'Done',
-    score: 420,
+    score: 720,
   };
 }
 

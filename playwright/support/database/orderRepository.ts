@@ -5,6 +5,41 @@ import { OrderDetails } from '../actions/orderLookupActions'
 
 import crypto from 'crypto'
 
+function isPostgresAuthError(error: unknown) {
+  if (!error || typeof error !== 'object') return false
+
+  const pgError = error as { code?: string; message?: string; errno?: string }
+  return pgError.code === '28P01' || pgError.message?.includes('password authentication failed') === true
+}
+
+function isTransientDbConnectionError(error: unknown) {
+  if (!error || typeof error !== 'object') return false
+
+  const pgError = error as { code?: string; message?: string; errno?: string }
+
+  const transientCodes = new Set([
+    'ETIMEDOUT',
+    'ECONNRESET',
+    'ECONNREFUSED',
+    'EHOSTUNREACH',
+    'ENETUNREACH',
+  ])
+
+  return (
+    transientCodes.has(pgError.code ?? '') ||
+    transientCodes.has(pgError.errno ?? '') ||
+    pgError.message?.includes('connect ETIMEDOUT') === true
+  )
+}
+
+function shouldIgnoreCleanupError(error: unknown) {
+  return isPostgresAuthError(error) || isTransientDbConnectionError(error)
+}
+
+export function isDbUnavailableError(error: unknown) {
+  return shouldIgnoreCleanupError(error)
+}
+
 export function normalizeValue(value: string) {
   if (!value) return '';
 
@@ -37,10 +72,24 @@ export async function insertOrder(order: OrderDetails) {
   await db.insertInto('orders').values(data).execute()
 }
 
+export async function ensureDatabaseAvailable() {
+  await db.selectFrom('orders').select('id').limit(1).execute()
+}
+
 export async function deleteOrderByNumber(orderNumber: string) {
-  await db.deleteFrom('orders').where('order_number', '=', orderNumber).execute()
+  try {
+    await db.deleteFrom('orders').where('order_number', '=', orderNumber).execute()
+  } catch (error) {
+    if (!shouldIgnoreCleanupError(error)) throw error
+    console.warn('Skipping order cleanup due to database connectivity/auth issue.')
+  }
 }
 
 export async function deleteOrderByEmail(email: string) {
-  await db.deleteFrom('orders').where('customer_email', '=', email).execute()
+  try {
+    await db.deleteFrom('orders').where('customer_email', '=', email).execute()
+  } catch (error) {
+    if (!shouldIgnoreCleanupError(error)) throw error
+    console.warn('Skipping order cleanup due to database connectivity/auth issue.')
+  }
 }
