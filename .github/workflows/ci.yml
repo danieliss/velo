@@ -12,8 +12,6 @@ env:
   NODE_VERSION: '24'
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
   VERCEL_SCOPE: danieliss-projects
-  # VERCEL_PROJECT_ID: 
-  # VERCEL_ORG_ID: 
 
 jobs:
   unit-tests:
@@ -39,25 +37,23 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # Executa apenas testes unitários (ignora pasta playwright)
+      # Executa apenas testes unitários (ideal: excluir playwright via config)
       - name: Run unit tests
-        run: yarn test 
-        ##-- --exclude=playwright
+        run: yarn test -- --exclude=playwright
 
-  
-build-and-deploy:
-  name: Build & Deploy Vercel Preview
-  needs: [unit-tests]
-  runs-on: ubuntu-latest
+  build-and-deploy:
+    name: Build and Deploy Vercel Preview
+    needs: [unit-tests]
+    runs-on: ubuntu-latest
 
-  steps:
+    steps:
       # Faz checkout do código do repositório
       - name: Checkout repository
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v4
 
       # Configura a versão do Node.js definida na variável global
       - name: Setup Node.js
-        uses: actions/setup-node@v6.4.0
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -75,4 +71,4 @@ build-and-deploy:
 
       # Deploy Preview Vercel
       - name: Deploy Vercel preview
-        run: yarn vercel deploy --prebuilt --target=preview --token=$VERCEL_TOKEN --scope=VERCEL_SCOPE
+        run: yarn vercel deploy --prebuilt --target=preview --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE
