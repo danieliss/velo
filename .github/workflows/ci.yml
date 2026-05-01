@@ -12,6 +12,9 @@ env:
   NODE_VERSION: '24'
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
   VERCEL_SCOPE: danieliss-projects
+  # VERCEL_PROJECT_ID: 
+  # VERCEL_ORG_ID: 
+
 jobs:
   unit-tests:
     name: Unit Tests
@@ -38,7 +41,8 @@ jobs:
 
       # Executa apenas testes unitários (ignora pasta playwright)
       - name: Run unit tests
-        run: yarn test -- --exclude=playwright
+        run: yarn test 
+        ##-- --exclude=playwright
 
   
 build-and-deploy:
