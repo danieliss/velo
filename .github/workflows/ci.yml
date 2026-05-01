@@ -1,5 +1,5 @@
 # Workflow de Integração Contínua focado em testes unitários
-# Estrutura simples e preparada para expansão futura (ex: adicionar lint, e2e, build, etc.)
+# Evita execução de testes E2E (Playwright) e mantém estrutura pronta para expansão
 
 name: Continuous Integration
 
@@ -19,11 +19,11 @@ jobs:
     steps:
       # Faz checkout do código do repositório
       - name: Checkout repository
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v4
 
       # Configura a versão do Node.js definida na variável global
       - name: Setup Node.js
-        uses: actions/setup-node@v6.4.0
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -35,6 +35,6 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # Executa os testes unitários com Vitest
+      # Executa apenas testes unitários (ignora pasta playwright)
       - name: Run unit tests
-        run: yarn test
+        run: yarn test -- --exclude=playwright
