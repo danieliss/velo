@@ -11,7 +11,9 @@ on:
 env:
   NODE_VERSION: '24'
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-  VERCEL_SCOPE: danieliss-projects
+  VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
 
 jobs:
   unit-tests:
@@ -65,10 +67,10 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # Build para o Vercel
+      # Build para o Vercel (usando npx)
       - name: Build Vercel
-        run: yarn vercel build --token=$VERCEL_TOKEN
+        run: npx vercel build --token=$VERCEL_TOKEN
 
-      # Deploy Preview Vercel
+      # Deploy Preview Vercel (usando npx)
       - name: Deploy Vercel preview
-        run: yarn vercel deploy --prebuilt --target=preview --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE
+        run: npx vercel deploy --prebuilt --target=preview --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE
