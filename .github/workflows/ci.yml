@@ -19,27 +19,21 @@ jobs:
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
-
     steps:
-      # Faz checkout do código do repositório
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Configura a versão do Node.js definida na variável global
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # Habilita o Corepack para gerenciamento do Yarn
       - name: Enable Corepack
         run: corepack enable
 
-      # Instala as dependências usando yarn.lock
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # Executa apenas testes unitários (ignora Playwright E2E)
       - name: Run unit tests
         run: yarn test -- --exclude=playwright
 
@@ -47,30 +41,26 @@ jobs:
     name: Build and Deploy Vercel Preview
     needs: [unit-tests]
     runs-on: ubuntu-latest
-
     steps:
-      # Faz checkout do código do repositório
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Configura a versão do Node.js definida na variável global
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # Habilita o Corepack para gerenciamento do Yarn
       - name: Enable Corepack
         run: corepack enable
 
-      # Instala as dependências usando yarn.lock
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # Build para o Vercel (usando npx)
+      - name: Pull Vercel Environment
+        run: npx vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+
       - name: Build Vercel
         run: npx vercel build --token=$VERCEL_TOKEN
 
-      # Deploy Preview Vercel (usando npx)
       - name: Deploy Vercel preview
         run: npx vercel deploy --prebuilt --target=preview --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE
