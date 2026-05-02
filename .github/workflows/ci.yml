@@ -11,9 +11,9 @@ on:
 env:
   NODE_VERSION: '24'
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-  VERCEL_PROJECT_ID: prj_z4pUIqgBDHF7qc2uOywJBjuY4Srj
-  VERCEL_ORG_ID: team_YVBsEwYIr0kG6AwVagPYbfxW
-  VERCEL_SCOPE: danieliss-projects
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE }}
 
 jobs:
   unit-tests:
