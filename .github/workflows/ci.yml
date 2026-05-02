@@ -205,7 +205,7 @@ jobs:
         run: yarn install
 
       # 5. Instalação do Chromium
-      - name: Install Plawright Browser
+      - name: Install Playwright Browser
         run: yarn playwright install --with-deps chromium
 
       # 6. Execução dos Testes de Regressão
