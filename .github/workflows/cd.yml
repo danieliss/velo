@@ -74,7 +74,12 @@ jobs:
         run: |
           result=$(npx vercel deploy --prebuilt --target=preview --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE --json)
           url=$(echo $result | jq -r '.url')
-          echo "deployment_url=https://$url" >> $GITHUB_OUTPUT
+          if [[ $url == http* ]]; then
+            final_url=$url
+          else
+            final_url="https://$url"
+          fi
+          echo "deployment_url=$final_url" >> $GITHUB_OUTPUT
 
   e2e-tests:
     name: Run E2E Tests
