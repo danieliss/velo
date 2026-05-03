@@ -82,59 +82,66 @@ jobs:
           echo "deployment_url=$final_url" >> $GITHUB_OUTPUT
 
   e2e-tests:
-    name: Run E2E Tests
-    needs: [build-and-deploy]
-    runs-on: ubuntu-latest
+  name: Run E2E Tests
+  needs: [build-and-deploy]
+  runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
 
-      - name: Enable Corepack
-        run: corepack enable
+    - name: Enable Corepack
+      run: corepack enable
 
-      - name: Install dependencies
-        run: yarn install
+    - name: Install dependencies
+      run: yarn install
 
-      - name: Install Playwright Browser
-        run: yarn playwright install --with-deps chromium
+    - name: Install Playwright Browser
+      run: yarn playwright install --with-deps chromium
 
-      - name: Debug BASE_URL
-        run: echo "BASE_URL=${{ needs.build-and-deploy.outputs.deployment-url }}"
+    - name: Debug BASE_URL
+      run: echo "BASE_URL=${{ needs.build-and-deploy.outputs.deployment-url }}"
 
-      - name: Wait for app to be ready
-        run: |
-          for i in {1..10}; do
-            if curl -s ${{ needs.build-and-deploy.outputs.deployment-url }} > /dev/null; then
-              echo "App is up!"
-              exit 0
-            fi
-            echo "Waiting for app..."
-            sleep 5
-          done
-          echo "App did not become ready in time"
-          exit 1
+    - name: Wait for app to be ready
+      run: |
+        for i in {1..20}; do
+          if curl -s --fail --max-time 10 ${{ needs.build-and-deploy.outputs.deployment-url }} > /dev/null; then
+            echo "App is up!"
+            exit 0
+          fi
+          echo "Waiting for app..."
+          sleep 5
+        done
+        echo "App did not become ready in time"
+        exit 1
 
-      - name: Run E2E Regression Tests
-        run: yarn playwright test
-        env:
-          BASE_URL: ${{ needs.build-and-deploy.outputs.deployment-url }}
+    # 👇 AQUI ENTRA O SEED (NO LUGAR CERTO)
+    - name: Seed database
+      run: yarn seed
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
-      - name: Upload Playwright report
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: playwright-report
-      
-      - name: Publish Testdino Report
-        if: ${{ !cancelled() }}
-        run: npx tdpw upload ./playwright-report --token=${{ secrets.TD_TOKEN }}
+    - name: Run E2E Regression Tests
+      run: yarn playwright test
+      env:
+        BASE_URL: ${{ needs.build-and-deploy.outputs.deployment-url }}
+
+    - name: Upload Playwright report
+      if: ${{ !cancelled() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-report
+        path: playwright-report
+
+    - name: Publish Testdino Report
+      if: ${{ !cancelled() }}
+      run: npx tdpw upload ./playwright-report --token=${{ secrets.TD_TOKEN }}
 
   deploy-production:
     name: Deploy Production
