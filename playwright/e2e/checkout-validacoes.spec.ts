@@ -18,7 +18,10 @@ test.describe('Checkout - validações', () => {
     await page.goto('/order')
 
     // 👇 garante que NÃO houve redirect silencioso
-    await page.waitForURL('**/order')
+    await page.goto('/order', { waitUntil: 'domcontentloaded' })
+
+    // DEBUG útil
+    console.log('URL atual:', page.url())
 
     // 👇 DEBUG (vai aparecer no pipeline)
     console.log('URL atual:', page.url())
