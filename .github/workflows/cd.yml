@@ -66,7 +66,7 @@ jobs:
       - name: Deploy Vercel preview
         id: deploy_preview
         run: |
-          url=$(npx vercel deploy --prebuilt --target=preview --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE)
+          url=$(npx vercel deploy --prebuilt --target=preview --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE | grep -Eo 'https://[^ ]+\.vercel\.app')
           echo "deployment_url=$url" >> $GITHUB_OUTPUT
 
   e2e-tests:
@@ -91,6 +91,9 @@ jobs:
 
       - name: Install Playwright Browser
         run: yarn playwright install --with-deps chromium
+
+      - name: Debug BASE_URL
+        run: echo "BASE_URL=${{ needs.build-and-deploy.outputs.deployment-url }}"
 
       - name: Run E2E Regression Tests
         run: yarn playwright test
