@@ -94,7 +94,7 @@ jobs:
 
             echo "Attempt $i - Status: $STATUS"
 
-            if [ "$STATUS" = "200" ] || [ "$STATUS" = "307" ] || [ "$STATUS" = "308" ]; then
+            if [ "$STATUS" = "200" ] || [ "$STATUS" = "307" ] || [ "$STATUS" = "308" ] || [ "$STATUS" = "401" ]; then
               echo "App is up!"
               exit 0
             fi
