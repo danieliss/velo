@@ -17,22 +17,15 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Run unit tests
-        run: yarn test -- --exclude=playwright
+      - run: corepack enable
+      - run: yarn install --frozen-lockfile
+      - run: yarn test -- --exclude=playwright
 
   build-and-deploy:
     name: Build and Deploy Vercel Preview
@@ -43,31 +36,20 @@ jobs:
       deployment-url: ${{ steps.deploy_preview.outputs.deployment_url }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Enable Corepack
-        run: corepack enable
+      - run: corepack enable
+      - run: yarn install --frozen-lockfile
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+      - run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Link Vercel Project
-        run: npx vercel link --yes --project $VERCEL_PROJECT_ID --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE
-
-      - name: Pull Vercel Environment (Preview)
-        run: npx vercel pull --yes --environment=preview --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE
-
-      - name: Build Vercel
-        run: npx vercel build --token=$VERCEL_TOKEN
+      - run: npx vercel link --yes --project $VERCEL_PROJECT_ID --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE
+      - run: npx vercel pull --yes --environment=preview --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE
+      - run: npx vercel build --token=$VERCEL_TOKEN
 
       - name: Deploy Vercel preview
         id: deploy_preview
@@ -87,36 +69,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Enable Corepack
-        run: corepack enable
+      - run: corepack enable
+      - run: yarn install
 
-      - name: Install dependencies
-        run: yarn install
+      - run: yarn playwright install --with-deps chromium
 
-      - name: Install Playwright Browser
-        run: yarn playwright install --with-deps chromium
-
-      - name: Debug BASE_URL
-        run: echo "BASE_URL=${{ needs.build-and-deploy.outputs.deployment-url }}"
+      - name: Debug URL
+        run: echo "URL=${{ needs.build-and-deploy.outputs.deployment-url }}"
 
       - name: Wait for app to be ready
         run: |
-          for i in {1..20}; do
-            if curl -s --fail --max-time 10 ${{ needs.build-and-deploy.outputs.deployment-url }} > /dev/null; then
+          URL=${{ needs.build-and-deploy.outputs.deployment-url }}
+
+          echo "Testing URL: $URL"
+
+          for i in {1..30}; do
+            STATUS=$(curl -o /dev/null -s -w "%{http_code}" $URL || true)
+
+            echo "Attempt $i - Status: $STATUS"
+
+            if [ "$STATUS" = "200" ] || [ "$STATUS" = "307" ] || [ "$STATUS" = "308" ]; then
               echo "App is up!"
               exit 0
             fi
-            echo "Waiting for app..."
+
             sleep 5
           done
+
           echo "App did not become ready in time"
           exit 1
 
@@ -148,25 +133,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Enable Corepack
-        run: corepack enable
+      - run: corepack enable
+      - run: yarn install --frozen-lockfile
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Pull Vercel Production Environment
-        run: npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-
-      - name: Build Vercel Production
-        run: npx vercel build --prod --token=$VERCEL_TOKEN
-
-      - name: Deploy Vercel Production
-        run: npx vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE
+      - run: npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+      - run: npx vercel build --prod --token=$VERCEL_TOKEN
+      - run: npx vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE
