@@ -56,7 +56,10 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-    
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: Link Vercel Project
         run: npx vercel link --yes --project $VERCEL_PROJECT_ID --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE
 
@@ -64,13 +67,14 @@ jobs:
         run: npx vercel pull --yes --environment=preview --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE
 
       - name: Build Vercel
-        run: npx vercel build --token=$VERCEL_TOKEN --environment=preview
+        run: npx vercel build --token=$VERCEL_TOKEN
 
       - name: Deploy Vercel preview
         id: deploy_preview
         run: |
-          url=$(npx vercel deploy --prebuilt --target=preview --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE | grep -Eo 'https://[^ ]+\.vercel\.app')
-          echo "deployment_url=$url" >> $GITHUB_OUTPUT
+          result=$(npx vercel deploy --prebuilt --target=preview --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE --json)
+          url=$(echo $result | jq -r '.url')
+          echo "deployment_url=https://$url" >> $GITHUB_OUTPUT
 
   e2e-tests:
     name: Run E2E Tests
