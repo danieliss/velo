@@ -2,7 +2,22 @@ import { test, expect } from '../support/fixtures'
 
 test.describe('Checkout - validações', () => {
   test.beforeEach(async ({ page, app }) => {
+
+    // 👇 injeta estado do carrinho ANTES da página carregar
+    await page.addInitScript(() => {
+      localStorage.setItem('cart', JSON.stringify([
+        {
+          id: 1,
+          name: 'Bike Teste',
+          price: 1000
+        }
+      ]))
+    })
+
+    // 👇 agora navega
     await page.goto('/order')
+
+    // 👇 agora deve encontrar o checkout
     await app.checkout.expectLoaded()
   })
 
