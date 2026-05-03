@@ -95,6 +95,19 @@ jobs:
       - name: Debug BASE_URL
         run: echo "BASE_URL=${{ needs.build-and-deploy.outputs.deployment-url }}"
 
+      - name: Wait for app to be ready
+        run: |
+          for i in {1..10}; do
+            if curl -s ${{ needs.build-and-deploy.outputs.deployment-url }} > /dev/null; then
+              echo "App is up!"
+              exit 0
+            fi
+            echo "Waiting for app..."
+            sleep 5
+          done
+          echo "App did not become ready in time"
+          exit 1
+
       - name: Run E2E Regression Tests
         run: yarn playwright test
         env:
