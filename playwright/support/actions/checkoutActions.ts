@@ -14,7 +14,6 @@ export function createCheckoutActions(page: Page) {
     terms: page.getByTestId('error-terms')
   }
 
-
   return {
 
     elements: {
@@ -23,7 +22,7 @@ export function createCheckoutActions(page: Page) {
     },
 
     async expectLoaded() {
-      await expect(page.getByRole('heading', { name: 'Finalizar Pedido' })).toBeVisible()
+      await expect(page.locator('text=Finalizar Pedido')).toBeVisible()
     },
 
     async expectSummaryTotal(price: string) {

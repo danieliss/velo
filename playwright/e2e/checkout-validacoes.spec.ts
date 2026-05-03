@@ -14,10 +14,16 @@ test.describe('Checkout - validações', () => {
       ]))
     })
 
-    // 👇 agora navega
+    // 👇 navega
     await page.goto('/order')
 
-    // 👇 agora deve encontrar o checkout
+    // 👇 garante que NÃO houve redirect silencioso
+    await page.waitForURL('**/order')
+
+    // 👇 DEBUG (vai aparecer no pipeline)
+    console.log('URL atual:', page.url())
+
+    // 👇 valida carregamento
     await app.checkout.expectLoaded()
   })
 
